@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: grafana
+  name: grafana-dep
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - image: grafana/grafana:7.5.2
+          name: grafana
+          ports:
+            - containerPort: 3000
+              name: http-grafana
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/grafana/provisioning/datasources
+              name: grafana-datasource-config-volume
+            - mountPath: /etc/grafana/provisioning/dashboards
+              name: grafana-dashboards-config-volume
+      volumes:
+        - name: grafana-datasource-config-volume
+          configMap:
+            name: grafana-datasource-config
+        - name: grafana-dashboards-config-volume
+          configMap:
+            name: grafana-dashboards-config

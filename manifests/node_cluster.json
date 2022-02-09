@@ -1,0 +1,5 @@
+{
+  "network-id": "local",
+  "bootstrap-ips": "10.107.190.185:9651",
+  "bootstrap-ids": "NodeID-HdXLdNx3FNLbhrbEgNrNqEtPgFqRH1gRe"
+}

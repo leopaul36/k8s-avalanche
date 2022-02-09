@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: avalanche-network-statefulset
+  labels:
+    app: avalanche-network
+spec:
+  selector:
+    matchLabels:
+      app: avalanche-network
+  serviceName: "nginx"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avalanche-network
+    spec:
+      containers:
+      - name: avalanchego
+        image: avaplatform/avalanchego
+        command: ["./avalanchego", "--config-file=config/node_cluster.json"]
+        volumeMounts:
+        - name: avalanchego-config-volume
+          mountPath: /avalanchego/build/config
+      volumes:
+        - name: avalanchego-config-volume
+          configMap:
+            name: avalanchego-config-cluster
+

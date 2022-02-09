@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: avalanche-network-bootstrap-deployment
+  labels:
+    app: avalanche-network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: avalanche-network
+  template:
+    metadata:
+      labels:
+        app: avalanche-network
+    spec:
+      containers:
+      - name: avalanchego
+        image: avaplatform/avalanchego
+        command: ["./avalanchego", "--config-file=config/node_bootstrap.json", "--http-host=$(MY_POD_IP)"]
+        volumeMounts:
+        - name: avalanchego-config-volume
+          mountPath: /avalanchego/build/config
+        ports:
+        - containerPort: 9650
+        env:
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      volumes:
+        - name: avalanchego-config-volume
+          configMap:
+            name: avalanchego-config-bootstrap

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: avalanche-network-bootstrap-svc
+  labels:
+    app: avalanche-network
+spec:
+  ports:
+  - name: http-port
+    port: 9650
+    protocol: TCP
+  - name: staking-port
+    port: 9651
+    protocol: TCP
+  selector:
+    app: avalanche-network
