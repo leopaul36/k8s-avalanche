@@ -1,18 +1,17 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: avalanche-network-bootstrap-deployment
-  labels:
-    app: avalanche-network
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: avalanche-network
+      node: avalanche-bootstrap
   template:
     metadata:
       labels:
-        app: avalanche-network
+        node: avalanche-bootstrap
     spec:
       containers:
       - name: avalanchego

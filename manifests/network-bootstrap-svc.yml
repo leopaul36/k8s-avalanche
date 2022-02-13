@@ -13,4 +13,4 @@ spec:
     port: 9651
     protocol: TCP
   selector:
-    app: avalanche-network
+    node: avalanche-bootstrap

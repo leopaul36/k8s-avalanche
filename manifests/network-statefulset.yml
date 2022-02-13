@@ -5,6 +5,7 @@ metadata:
   name: avalanche-network-statefulset
   labels:
     app: avalanche-network
+    node: cluster
 spec:
   selector:
     matchLabels:
