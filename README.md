@@ -14,7 +14,6 @@ We will first a single Avalanche node from which our next nodes will bootstrap
 ```
 kubectl create configmap avalanchego-config-bootstrap --from-file=manifests/node_bootstrap.json
 kubectl apply -f manifests/network-bootstrap.yml
-kubectl logs -l app=avalanche-network --tail=-1 | grep "node ID is" | awk '{ print $7}'
 ```
 
 ## Avalanche bootstrap service
@@ -28,7 +27,41 @@ kubectl get svc avalanche-network-bootstrap-svc -o custom-columns=CLUSTER-IP:.sp
 
 ## Avalanche cluster
 
-Finally we can run another Avalanche node that will bootstrap from the previous one.
+The next step is to run another Avalanche node that will bootstrap from the previous one.
+
+We need to specify the `NodeID` of the bootstrap node in a new `ConfigMap`.
+
+The next command gives us the `NodeID` of the `node=avalanche-bootstrap` Deployment:
+
+```
+kubectl logs -l node=avalanche-bootstrap --tail=-1 | grep "node ID is" | awk '{ print $7}'
+```
+
+e.g.: `NodeID-HnjB8pmbe9QEYbCS9x7Menq9oTYTW4csD`
+
+We also need to specify the endpoint at which our bootstrap Avalanche node can be reached. This is the IP of the previously created service:
+
+```
+kubectl get svc avalanche-network-bootstrap-svc -o custom-columns=CLUSTER-IP:.spec.clusterIP
+```
+
+e.g.: 
+```
+CLUSTER-IP
+10.106.46.18
+```
+
+Let's replace the `bootstrap-ids` and `bootstrap-ips` property of `manifests/node_cluster.json` with the appropriate values. For example:
+
+```
+{
+  "network-id": "local",
+  "bootstrap-ips": "10.106.46.18:9651",
+  "bootstrap-ids": "NodeID-HnjB8pmbe9QEYbCS9x7Menq9oTYTW4csD"
+}
+```
+
+Now we are ready to spin up an additionnal node to our Avalanche network:
 
 ```
 kubectl create configmap avalanchego-config-cluster --from-file=manifests/node_cluster.json
@@ -43,13 +76,25 @@ kubectl scale statefulset avalanche-network-statefulset --replicas=5
 
 ## Monitoring
 
+The Avalanche Cluster is ready. Before starting to deploy contracts or subnets, we will deploy some monitoring services to see how our cluster behaves.
+
 ### Prometheus
+
+A cool thing about `[AvalancheGo](https://github.com/ava-labs/avalanchego)` is that it embeds a [Prometheus](https://prometheus.io/) compatible metrics api out-of-the-box.
+
+If we deploy and properly configure a Prometheus instance in the Kubernetes cluster, we will be able to scrap theses metrics for montoring.
 
 ```
 kubectl create configmap prometheus-config --from-file=manifests/monitoring/prometheus.yml
 kubectl apply -f manifests/monitoring/prometheus-dep.yml
 kubectl apply -f manifests/monitoring/prometheus-svc.yml
 ```
+
+Let's open the Prometheus UI and see if the `avalanche` target is running:
+
+![Prometheus target](./static/prometheus_target.png)
+
+It works, Prometheus is scrapping the data from the Avalanche bootstrap node. 
 
 ### Grafana
 
