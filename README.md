@@ -80,7 +80,7 @@ The Avalanche Cluster is ready. Before starting to deploy contracts or subnets, 
 
 ### Prometheus
 
-A cool thing about `[AvalancheGo](https://github.com/ava-labs/avalanchego)` is that it embeds a [Prometheus](https://prometheus.io/) compatible metrics api out-of-the-box.
+A cool thing about [AvalancheGo](https://github.com/ava-labs/avalanchego) is that it embeds a [Prometheus](https://prometheus.io/) compatible metrics api out-of-the-box.
 
 If we deploy and properly configure a Prometheus instance in the Kubernetes cluster, we will be able to scrap theses metrics for montoring.
 
