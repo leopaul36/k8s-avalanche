@@ -1,6 +1,6 @@
 # Kubernetes Avalanche
 
-This repository provides basic Kubernetes manifests to spin up a local Avalanche local network.
+This repository provides basic manifests to spin up a local Avalanche local network in Kubernetes with Minikube.
 
 ## Prerequisites
 
@@ -22,7 +22,6 @@ We then need to expose the `http-port` and `staking-port` of our bootstrap node 
 
 ```
 kubectl apply -f manifests/network-bootstrap-svc.yml
-kubectl get svc avalanche-network-bootstrap-svc -o custom-columns=CLUSTER-IP:.spec.clusterIP
 ```
 
 ## Avalanche cluster
@@ -90,7 +89,7 @@ kubectl apply -f manifests/monitoring/prometheus-dep.yml
 kubectl apply -f manifests/monitoring/prometheus-svc.yml
 ```
 
-Let's open the Prometheus UI and see if the `avalanche` target is running:
+Let's open the Prometheus UI (`minikube service prometheus-svc`) and see if the `avalanche` target is running:
 
 ![Prometheus target](./static/prometheus_target.png)
 
@@ -98,19 +97,28 @@ It works, Prometheus is scrapping the data from the Avalanche bootstrap node.
 
 ### Grafana
 
+The final step to have a complete monitoring is setting up [Grafana](https://grafana.com/) to visualize the Avalanche nodes metrics gathered in Prometheus.
+
 ```
-kubectl create configmap grafana-datasource-config --from-file=manifests/monitoring/prom.yml
-kubectl apply -f manifests/monitoring/grafana-dashboards-cm.yml
+kubectl apply -f manifests/monitoring/provisionning/grafana-dashboards-cm.yml
+kubectl apply -f manifests/monitoring/provisionning/grafana-dashboards-provisionning-cm.yml
+kubectl apply -f manifests/monitoring/provisionning/grafana-datasource-provisionning-cm.yml
 kubectl apply -f manifests/monitoring/grafana-dep.yml
 kubectl apply -f manifests/monitoring/grafana-svc.yml
 ```
+
+We can then open Grafana (`minikube service grafana-svc`) and check out our metrics. Here is an excerpt of the pre-configured `Network` dashboard:
+
+![Prometheus target](./static/grafana_network.png)
+
+Nothing much to see here because we have not deployed anything on the network yet but we can notice the surge of `peer count` and global activity when we scaled the cluster to 5 replicas.
 
 ## TODO
 
 - [ ] Improve README.md
 - [ ] Improve [Monitoring](https://docs.avax.network/build/tutorials/nodes-and-staking/setting-up-node-monitoring/) by adding node_exporter metrics and enabling [Kubernetes service discovery](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config)
 
-## Related projects
+## Related projects and sources
 
 - https://github.com/ava-labs/avalanche-network-runner
 - https://github.com/ava-labs/avalanchego
