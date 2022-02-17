@@ -24,11 +24,16 @@ spec:
             - mountPath: /etc/grafana/provisioning/datasources
               name: grafana-datasource-config-volume
             - mountPath: /etc/grafana/provisioning/dashboards
+              name: grafana-dashboards-provisionning-config-volume
+            - mountPath: /etc/grafana/dashboards
               name: grafana-dashboards-config-volume
       volumes:
         - name: grafana-datasource-config-volume
           configMap:
             name: grafana-datasource-config
+        - name: grafana-dashboards-provisionning-config-volume
+          configMap:
+            name: grafana-dashboards-provisionning-config
         - name: grafana-dashboards-config-volume
           configMap:
             name: grafana-dashboards-config
